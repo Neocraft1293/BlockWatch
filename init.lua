@@ -74,7 +74,7 @@ local function log_event(pos, event_type, entity, node_name)
     save_events()
 end
 
--- Exemple d'utilisation : enregistrez un événement lorsque le joueur casse ou place un bloc
+-- enregistrez un événement lorsque le joueur casse ou place un bloc
 minetest.register_on_dignode(function(pos, oldnode, digger)
     if digger then
         local node_name = oldnode.name
@@ -89,7 +89,7 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
     end
 end)
 
--- Exemple d'utilisation : enregistrez un événement lorsque le joueur utilise l'outil d'information sur le bloc pointé
+--  enregistrez un événement lorsque le joueur utilise l'outil d'information sur le bloc pointé
 minetest.register_craftitem("blockwatch:selected_block_info_tool", {
     description = "Outil d'information sur le bloc pointé",
     inventory_image = "blockwatch_selected_block_info_tool.png", -- Assurez-vous d'avoir une image valide
