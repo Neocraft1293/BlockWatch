@@ -16,7 +16,7 @@ local function load_database()
     else
         -- Créer le fichier JSON s'il n'existe pas
         local new_json_file = io.open(json_file_path, "w")
-        new_json_file:write(minetest.serialize(events))
+        new_json_file:write(minetest.write_json(events))
         new_json_file:close()
         minetest.log("action", "[Modname] Nouvelle base de données créée.")
     end
@@ -26,13 +26,13 @@ end
 local function save_events()
     local json_file = io.open(json_file_path, "w")
     if json_file then
-        json_file:write(minetest.serialize(events))
+        json_file:write(minetest.write_json(events))
         json_file:close()
     end
 end
 
 -- Fonction pour enregistrer un nouvel événement
-local function log_event(pos, event_type, entity)
+local function log_event(pos, event_type, entity, node_name)
     local key = minetest.pos_to_string(pos)
 
     if not events[key] then
@@ -42,6 +42,7 @@ local function log_event(pos, event_type, entity)
     local event = {
         event_type = event_type,
         entity = entity,
+        node_name = node_name,
         timestamp = os.date("%Y-%m-%dT%H:%M:%S")
     }
 
@@ -52,13 +53,15 @@ end
 -- Exemple d'utilisation : enregistrez un événement lorsque le joueur casse ou place un bloc
 minetest.register_on_dignode(function(pos, oldnode, digger)
     if digger then
-        log_event(pos, "break", digger:get_player_name())
+        local node_name = oldnode.name
+        log_event(pos, "break", digger:get_player_name(), node_name)
     end
 end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
     if placer then
-        log_event(pos, "place", placer:get_player_name())
+        local node_name = newnode.name
+        log_event(pos, "place", placer:get_player_name(), node_name)
     end
 end)
 
