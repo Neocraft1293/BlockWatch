@@ -1,7 +1,7 @@
 -- modname/init.lua
 
 -- Chemin vers le fichier JSON
-local json_file_path = minetest.get_worldpath() .. "/events.json"
+local json_file_path = minetest.get_worldpath() .. "/eventsbw.json"
 
 -- Initialiser la variable events en dehors de load_database
 local events = {}
