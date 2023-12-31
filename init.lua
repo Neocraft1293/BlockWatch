@@ -1,5 +1,5 @@
 -- Chemin vers le fichier JSON pour les événements
-local events_json_file_path = minetest.get_worldpath() .. "/eventsbw.json"
+local events_json_file_path = minetest.get_worldpath() .. "/blockwatch_data.json"
 
 -- Initialiser la variable events en dehors de load_database
 local events = {}
@@ -72,20 +72,49 @@ local function log_event(pos, event_type, entity, node_name)
     save_events()
 end
 
--- Exemple d'utilisation : enregistrez un événement lorsque le joueur casse ou place un bloc
+--  enregistrez un événement lorsque le joueur casse ou place un bloc
 minetest.register_on_dignode(function(pos, oldnode, digger)
-    if digger then
-        local node_name = oldnode.name
+    local node_name = oldnode.name
+
+    local entity = minetest.get_node_or_nil(pos) -- Récupérer le nœud à la position actuelle
+
+    -- Vérifier si un joueur est impliqué
+    if digger and digger:is_player() then
         log_event(pos, "break", digger:get_player_name(), node_name)
+    elseif entity then
+        -- Vérifier si c'est une entité autre qu'un joueur
+        local entity_type = entity.type
+        if entity_type and entity_type ~= "player" then
+            log_event(pos, "break", "Entity:" .. entity_type, node_name)
+        else
+            log_event(pos, "break", "Unknown", node_name)
+        end
+    else
+        log_event(pos, "break", "Unknown", node_name)
     end
 end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-    if placer then
-        local node_name = newnode.name
+    local node_name = newnode.name
+
+    local entity = minetest.get_node_or_nil(pos) -- Récupérer le nœud à la position actuelle
+
+    -- Vérifier si un joueur est impliqué
+    if placer and placer:is_player() then
         log_event(pos, "place", placer:get_player_name(), node_name)
+    elseif entity then
+        -- Vérifier si c'est une entité autre qu'un joueur
+        local entity_type = entity.type
+        if entity_type and entity_type ~= "player" then
+            log_event(pos, "place", "Entity:" .. entity_type, node_name)
+        else
+            log_event(pos, "place", "Unknown", node_name)
+        end
+    else
+        log_event(pos, "place", "Unknown", node_name)
     end
 end)
+
 
 
 
@@ -207,7 +236,7 @@ end
 -- Enregistrement de l'item avec le préfixe "blockwatch:"
 minetest.register_craftitem("blockwatch:block_data_checker", {
     description = "Vérificateur de données de bloc",
-    inventory_image = "blockwatch.png",  -- Remplacez ceci par le chemin de votre image d'inventaire
+    inventory_image = "blockwatch.png",  
     on_use = check_block_data_item,
 })
 
