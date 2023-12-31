@@ -152,7 +152,18 @@ minetest.register_chatcommand("check_block_data", {
 
         if blockwatch_data[key] and #blockwatch_data[key] > 0 then
             local json_data = minetest.write_json(blockwatch_data[key])
-            minetest.chat_send_player(name, "Données du bloc à " .. minetest.pos_to_string(pos) .. " : " .. json_data)
+
+            -- Formater les données pour les rendre plus lisibles
+            local formatted_data = ""
+            for _, event in ipairs(blockwatch_data[key]) do
+                formatted_data = formatted_data .. "entity: " .. event.entity .. "\n"
+                formatted_data = formatted_data .. "event_type: " .. event.event_type .. "\n"
+                formatted_data = formatted_data .. "node_name: " .. event.node_name .. "\n"
+                formatted_data = formatted_data .. "timestamp: " .. event.timestamp .. "\n\n"
+            end
+
+            minetest.chat_send_player(name, "Données du bloc à " .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
+            minetest.log("action", "[Modname] Données du bloc à " .. minetest.pos_to_string(pos) .. " : \n" .. json_data)
         else
             minetest.chat_send_player(name, "Aucune donnée trouvée pour le bloc à " .. minetest.pos_to_string(pos))
         end
