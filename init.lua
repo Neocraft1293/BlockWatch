@@ -171,3 +171,43 @@ minetest.register_chatcommand("check_block_data", {
         return true, "Vérification des données du bloc effectuée."
     end,
 })
+
+
+-- Fonction pour vérifier les données d'un bloc
+local function check_block_data_item(itemstack, user, pointed_thing)
+    if not user or not pointed_thing or not pointed_thing.under then
+        return
+    end
+
+    local pos = pointed_thing.under
+    local key = minetest.pos_to_string(pos)
+    
+    local blockwatch_data = load_blockwatch_data()
+
+    if not next(blockwatch_data) then
+        minetest.chat_send_player(user:get_player_name(), "La base de données est vide.")
+        return
+    end
+
+    if blockwatch_data[key] and #blockwatch_data[key] > 0 then
+        local formatted_data = ""
+        for _, event in ipairs(blockwatch_data[key]) do
+            formatted_data = formatted_data .. "entity: " .. event.entity .. "\n"
+            formatted_data = formatted_data .. "event_type: " .. event.event_type .. "\n"
+            formatted_data = formatted_data .. "node_name: " .. event.node_name .. "\n"
+            formatted_data = formatted_data .. "timestamp: " .. event.timestamp .. "\n\n"
+        end
+
+        minetest.chat_send_player(user:get_player_name(), "Données du bloc à " .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
+    else
+        minetest.chat_send_player(user:get_player_name(), "Aucune donnée trouvée pour le bloc à " .. minetest.pos_to_string(pos))
+    end
+end
+
+-- Enregistrement de l'item avec le préfixe "blockwatch:"
+minetest.register_craftitem("blockwatch:block_data_checker", {
+    description = "Vérificateur de données de bloc",
+    inventory_image = "blockwatch.png",  -- Remplacez ceci par le chemin de votre image d'inventaire
+    on_use = check_block_data_item,
+})
+
