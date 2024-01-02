@@ -240,3 +240,32 @@ minetest.register_craftitem("blockwatch:block_data_checker", {
     on_use = check_block_data_item,
 })
 
+
+-- Commande pour obtenir des statistiques sur la base de données des événements
+minetest.register_chatcommand("events_stats", {
+    description = "Obtient des statistiques sur la base de données des événements.",
+    func = function(name, param)
+        local num_events = 0
+        local total_size = 0
+
+        for key, event_list in pairs(events) do
+            num_events = num_events + #event_list
+
+            local json_data = minetest.write_json(event_list)
+            if json_data then
+                total_size = total_size + #json_data
+            else
+                minetest.log("error", "[Modname] Erreur lors de la sérialisation JSON pour les événements.")
+            end
+        end
+
+        local average_size_per_entry = num_events > 0 and total_size / num_events or 0
+
+        minetest.chat_send_player(name, "[Modname] Statistiques des événements :")
+        minetest.chat_send_player(name, "Nombre total d'événements : " .. num_events)
+        minetest.chat_send_player(name, "Taille totale de la base de données : " .. total_size .. " octets")
+        minetest.chat_send_player(name, "Moyenne de taille par entrée : " .. average_size_per_entry .. " octets/entrée")
+
+        return true, "[Modname] Statistiques des événements envoyées au joueur " .. name .. "."
+    end,
+})
