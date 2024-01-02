@@ -1,3 +1,5 @@
+local S = minetest.get_translator("BlockWatch") -- Récupérer le traducteur pour ce mod
+
 -- Chemin vers le fichier JSON pour les événements
 local events_json_file_path = minetest.get_worldpath() .. "/blockwatch_data.json"
 
@@ -10,13 +12,13 @@ local function load_events_database()
     if json_file then
         events = minetest.deserialize(json_file:read("*all"))
         json_file:close()
-        minetest.log("action", "[Modname] Base de données des événements chargée avec succès.")
+        minetest.log("action", S("[blockwatch] Event database loaded successfully."))
     else
         -- Créer le fichier JSON s'il n'existe pas
         local new_json_file = io.open(events_json_file_path, "w")
         new_json_file:write(minetest.serialize(events))
         new_json_file:close()
-        minetest.log("action", "[Modname] Nouvelle base de données des événements créée.")
+        minetest.log("action", S("[blockwatch] New event database created."))
     end
 end
 
@@ -31,11 +33,11 @@ end
 
 -- Charge les données depuis le fichier JSON
 local function load_blockwatch_data()
-    minetest.log("action", "[Modname] Chargement des données depuis le fichier JSON : " .. events_json_file_path)
+    minetest.log("action", S("[blockwatch] Loading data from JSON file: ") .. events_json_file_path)
     local file = io.open(events_json_file_path, "r")
 
     if not file then
-        minetest.log("action", "[Modname] Le fichier JSON n'existe pas.")
+        minetest.log("action", S("[blockwatch] The JSON file does not exist."))
         return {}
     end
 
@@ -121,27 +123,35 @@ end)
 -- Fonction pour vérifier si la base de données des événements est chargée
 local function check_events_database()
     if next(events) then
-        minetest.chat_send_all("[Modname] La base de données des événements est chargée.")
+        minetest.chat_send_all(S("[blockwatch] The events database is loaded."))
     else
-        minetest.chat_send_all("[Modname] La base de données des événements n'est pas chargée.")
+        minetest.chat_send_all(S("[blockwatch] The events database is not loaded."))
     end
 end
 
+-- Définir une permission personnalisée
+minetest.register_privilege("blockwatch_perm", {
+    description = S("Allows access to Blockwatch commands."),
+    give_to_singleplayer = false,  -- Permettre à un joueur unique de posséder cette permission
+})
+
 -- Commande pour recharger la base de données des événements
-minetest.register_chatcommand("rdatab", {
-    description = "Recharge la base de données des événements.",
+minetest.register_chatcommand("reload_database_blockwatch", {
+    privs = {blockwatch_perm=true},
+    description = S("Reloads the events database."),
     func = function(name, param)
         load_events_database()
-        return true, "[Modname] Base de données des événements rechargée avec succès."
+        return true, S("[blockwatch] Events database reloaded successfully.")
     end,
 })
 
 -- Commande pour vérifier si la base de données des événements est chargée
-minetest.register_chatcommand("check_events_database", {
-    description = "Vérifie si la base de données des événements est chargée.",
+minetest.register_chatcommand("check_events_database_blockwatch", {
+    privs = {blockwatch_perm=true},
+    description = S("Check if the events database is loaded."),
     func = function(name, param)
         check_events_database()
-        return true, "[Modname] Vérification de la base de données des événements effectuée."
+        return true, S("[blockwatch] Events database verification complete.")
     end,
 })
 
@@ -149,8 +159,9 @@ minetest.register_chatcommand("check_events_database", {
 minetest.register_on_mods_loaded(load_events_database)
 
 -- Commande pour vérifier les données d'un bloc
-minetest.register_chatcommand("check_block_data", {
-    description = "Vérifie les données d'un bloc spécifique.",
+minetest.register_chatcommand("check_block_data_blockwatch", {
+    privs = {blockwatch_perm=true},
+    description = S("Check data for a specific block."),
     params = "<x> <y> <z>",
     func = function(name, param)
         local player = minetest.get_player_by_name(name)
@@ -161,13 +172,13 @@ minetest.register_chatcommand("check_block_data", {
 
         local x, y, z = param:match("(%S+)%s+(%S+)%s+(%S+)")
         if not x or not y or not z then
-            return false, "Veuillez spécifier les coordonnées du bloc (ex. /check_block_data 10 20 30)."
+            return false, S("Please specify the coordinates of the block (e.g., /check_block_data 10 20 30).")
         end
 
         x, y, z = tonumber(x), tonumber(y), tonumber(z)
 
         if not x or not y or not z then
-            return false, "Les coordonnées du bloc ne sont pas valides."
+            return false, S("The coordinates of the block are not valid.")
         end
 
         local pos = {x = x, y = y, z = z}
@@ -176,7 +187,7 @@ minetest.register_chatcommand("check_block_data", {
         local blockwatch_data = load_blockwatch_data()
 
         if not next(blockwatch_data) then
-            return false, "La base de données est vide."
+            return false, S("The database is empty.")
         end
 
         if blockwatch_data[key] and #blockwatch_data[key] > 0 then
@@ -191,13 +202,14 @@ minetest.register_chatcommand("check_block_data", {
                 formatted_data = formatted_data .. "timestamp: " .. event.timestamp .. "\n\n"
             end
 
-            minetest.chat_send_player(name, "Données du bloc à " .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
-            minetest.log("action", "[Modname] Données du bloc à " .. minetest.pos_to_string(pos) .. " : \n" .. json_data)
+            minetest.chat_send_player(name, S("Block data at ") .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
+            minetest.log("action", "[blockwatch] " .. S("Block data at ") .. minetest.pos_to_string(pos) .. " : \n" .. json_data)
+
         else
-            minetest.chat_send_player(name, "Aucune donnée trouvée pour le bloc à " .. minetest.pos_to_string(pos))
+            minetest.chat_send_player(name, S("No data found for the block at ") .. minetest.pos_to_string(pos))
         end
 
-        return true, "Vérification des données du bloc effectuée."
+        return true, S("Block data verification successful.")
     end,
 })
 
@@ -214,7 +226,7 @@ local function check_block_data_item(itemstack, user, pointed_thing)
     local blockwatch_data = load_blockwatch_data()
 
     if not next(blockwatch_data) then
-        minetest.chat_send_player(user:get_player_name(), "La base de données est vide.")
+        minetest.chat_send_player(user:get_player_name(), S("The database is empty."))
         return
     end
 
@@ -227,15 +239,15 @@ local function check_block_data_item(itemstack, user, pointed_thing)
             formatted_data = formatted_data .. "timestamp: " .. event.timestamp .. "\n\n"
         end
 
-        minetest.chat_send_player(user:get_player_name(), "Données du bloc à " .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
+        minetest.chat_send_player(user:get_player_name(), S("Block data at ") .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
     else
-        minetest.chat_send_player(user:get_player_name(), "Aucune donnée trouvée pour le bloc à " .. minetest.pos_to_string(pos))
+        minetest.chat_send_player(user:get_player_name(), S("No data found for the block at ") .. minetest.pos_to_string(pos))
     end
 end
 
 -- Enregistrement de l'item avec le préfixe "blockwatch:"
 minetest.register_craftitem("blockwatch:block_data_checker", {
-    description = "Vérificateur de données de bloc",
+    description = S("Block Data Checker"),
     inventory_image = "blockwatch.png",  
     on_use = check_block_data_item,
 })
@@ -243,7 +255,8 @@ minetest.register_craftitem("blockwatch:block_data_checker", {
 
 -- Commande pour obtenir des statistiques sur la base de données des événements
 minetest.register_chatcommand("events_stats", {
-    description = "Obtient des statistiques sur la base de données des événements.",
+    privs = {basic_privs=true, blockwatch_perm=true},
+    description = S("Event Database Statistics"),
     func = function(name, param)
         local num_events = 0
         local total_size = 0
@@ -255,17 +268,18 @@ minetest.register_chatcommand("events_stats", {
             if json_data then
                 total_size = total_size + #json_data
             else
-                minetest.log("error", "[Modname] Erreur lors de la sérialisation JSON pour les événements.")
+                minetest.log("error", S("[blockwatch] Error during JSON serialization for events."))
             end
         end
 
         local average_size_per_entry = num_events > 0 and total_size / num_events or 0
 
-        minetest.chat_send_player(name, "[Modname] Statistiques des événements :")
-        minetest.chat_send_player(name, "Nombre total d'événements : " .. num_events)
-        minetest.chat_send_player(name, "Taille totale de la base de données : " .. total_size .. " octets")
-        minetest.chat_send_player(name, "Moyenne de taille par entrée : " .. average_size_per_entry .. " octets/entrée")
+        minetest.chat_send_player(name, S("[blockwatch] Event Statistics:"))
+        minetest.chat_send_player(name, S("Total number of events: ") .. num_events)
+        minetest.chat_send_player(name, S("Total database size: ") .. total_size .. " " .. S("bytes"))
+        minetest.chat_send_player(name, S("Average size per entry: ") .. average_size_per_entry .. " " .. S("bytes/entry"))
 
-        return true, "[Modname] Statistiques des événements envoyées au joueur " .. name .. "."
+
+        return true, S("[blockwatch] Event statistics sent to player ") .. name .. "."
     end,
 })
