@@ -1,0 +1,31 @@
+# textdomain:BlockWatch
+
+[blockwatch] Database of events loaded successfully.=blockwatch:1:= [blockwatch] Database of events loaded successfully.
+[blockwatch] New event database created.=blockwatch:2:= [blockwatch] New event database created.
+[blockwatch] Loading data from JSON file: [file_path]=blockwatch:3:= [blockwatch] Loading data from JSON file: [file_path]
+[blockwatch] JSON file does not exist.=blockwatch:4:= [blockwatch] JSON file does not exist.
+[blockwatch] Event database loaded.=blockwatch:5:= [blockwatch] Event database loaded.
+[blockwatch] Event database not loaded.=blockwatch:6:= [blockwatch] Event database not loaded.
+Access Blockwatch commands.=blockwatch:7:=Access Blockwatch commands.
+Reloads the event database.=blockwatch:8:=Reloads the event database.
+[blockwatch] Event database reloaded successfully.=blockwatch:9:= [blockwatch] Event database reloaded successfully.
+Check if the event database is loaded.=blockwatch:10:=Check if the event database is loaded.
+[blockwatch] Event database verification completed.=blockwatch:11:= [blockwatch] Event database verification completed.
+Check data for a specific block.=blockwatch:12:=Check data for a specific block.
+Please specify block coordinates (e.g., /check_block_data 10 20 30).=blockwatch:13:=Please specify block coordinates (e.g., /check_block_data 10 20 30).
+Block coordinates are not valid.=blockwatch:14:=Block coordinates are not valid.
+The database is empty.=blockwatch:15:=The database is empty.
+[minetest] Player [player_name]: Block data at [position]: [formatted_data]=blockwatch:16:= [minetest] Player [player_name]: Block data at [position]: [formatted_data]
+[minetest] No data found for the block at [position]=blockwatch:17:= [minetest] No data found for the block at [position]
+[blockwatch] Block data check completed.=blockwatch:18:= [blockwatch] Block data check completed.
+[minetest] Player [player_name]: The database is empty.=blockwatch:19:= [minetest] Player [player_name]: The database is empty.
+[minetest] Player [player_name]: Block data at [position]: [formatted_data]=blockwatch:20:= [minetest] Player [player_name]: Block data at [position]: [formatted_data]
+[minetest] Player [player_name]: No data found for the block at [position]=blockwatch:21:= [minetest] Player [player_name]: No data found for the block at [position]
+Block Data Checker=blockwatch:22:=Block Data Checker
+Get statistics on the event database.=blockwatch:23:=Get statistics on the event database.
+[blockwatch] Event statistics:=blockwatch:24:= [blockwatch] Event statistics:
+Total number of events: [num_events]=blockwatch:25:=Total number of events: [num_events]
+Total database size: [total_size] bytes.=blockwatch:26:=Total database size: [total_size] bytes.
+Average size per entry: [average_size_per_entry] bytes/entry.=blockwatch:27:=Average size per entry: [average_size_per_entry] bytes/entry.
+[minetest] [blockwatch] Error serializing events to JSON.=blockwatch:28:= [minetest] [blockwatch] Error serializing events to JSON.
+[blockwatch] Event statistics sent to player [player_name].=blockwatch:29:= [blockwatch] Event statistics sent to player [player_name].

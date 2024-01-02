@@ -1,0 +1,34 @@
+# textdomain:BlockWatch
+
+[blockwatch] Event database loaded successfully.=[blockwatch] Base de données des événements chargée avec succès.
+[blockwatch] New event database created.=[blockwatch] Nouvelle base de données des événements créée.
+[blockwatch] Loading data from JSON file: @1=[blockwatch] Chargement des données depuis le fichier JSON : @1
+[blockwatch] The JSON file does not exist.=[blockwatch] Le fichier JSON n'existe pas.
+[blockwatch] The events database is loaded.=[blockwatch] La base de données des événements est chargée.
+[blockwatch] The events database is not loaded.=[blockwatch] La base de données des événements n'est pas chargée.
+Allows access to Blockwatch commands.=Permet d'accéder aux commandes de Blockwatch.
+Reloads the events database.=Recharge la base de données des événements.
+[blockwatch] Events database reloaded successfully.=[blockwatch] Base de données des événements rechargée avec succès.
+Check if the events database is loaded.=Vérifie si la base de données des événements est chargée.
+[blockwatch] Events database verification complete.=[blockwatch] Vérification de la base de données des événements effectuée.
+Check data for a specific block.=Vérifie les données d'un bloc spécifique.
+Please specify the coordinates of the block (e.g., /check_block_data 10 20 30).=Veuillez spécifier les coordonnées du bloc (par exemple, /check_block_data 10 20 30).
+The coordinates of the block are not valid.=Les coordonnées du bloc ne sont pas valides.
+The database is empty=La base de données est vide.
+Block data at =Données du bloc à
+Block data at =Données du bloc à
+No data found for the block at =Aucune donnée trouvée pour le bloc à
+Block data verification successful.=Vérification des données du bloc réussie.
+The database is empty.=La base de données est vide.
+Block data at =Données du bloc à
+No data found for the block at =Aucune donnée trouvée pour le bloc à
+Block Data Checker=Vérificateur de données de bloc
+Event Database Statistics=Statistiques sur la base de données des événements
+[blockwatch] Event Statistics=Statistiques des événements
+Total number of events=Nombre total d'événements
+Total database size=Taille totale de la base de données
+Average size per entry=Moyenne de taille par entrée
+bytes=octets
+[blockwatch] Error during JSON serialization for events.=Erreur lors de la sérialisation JSON pour les événements.
+[blockwatch] Event statistics sent to player [player_name].=Statistiques des événements envoyées au joueur [player_name].
+
