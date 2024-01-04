@@ -1,0 +1,33 @@
+# textdomain:BlockWatch
+
+[blockwatch] Event database loaded successfully.=[blockwatch] Ereignis-Datenbank erfolgreich geladen.
+[blockwatch] New event database created.=[blockwatch] Neue Ereignis-Datenbank erstellt.
+[blockwatch] Loading data from JSON file: @1=[blockwatch] Daten aus JSON-Datei werden geladen : @1
+[blockwatch] The JSON file does not exist.=[blockwatch] Keine JSON-Datei vorhanden.
+[blockwatch] The events database is loaded.=[blockwatch] Die Ereignis-Datenbank wurde geladen.
+[blockwatch] The events database is not loaded.=[blockwatch] Die Ereignis-Datenbank wurde nicht geladen.
+Allows access to Blockwatch commands.=Erlaubt Zugriff auf Blockwatch-Befehle.
+Reloads the events database.=Lädt die Ereignis-Datenbank erneut.
+[blockwatch] Events database reloaded successfully.=[blockwatch] Ereignis-Datenbank erfolgreich neu geladen.
+Check if the events database is loaded.=Prüfen, ob die Ereignis-Datenbank geladen wurde.
+[blockwatch] Events database verification complete.=[blockwatch] Prüfen der Ereignis-Datenbank vollständig.
+Check data for a specific block.=Daten für angegebenen Block prüfen.
+Please specify the coordinates of the block (e.g., /check_block_data 10 20 30).=Bitte die Koordinaten des Blocks angeben (Muster /check_block_data 10 20 30).
+The coordinates of the block are not valid.=Die Koordinaten des Blocks sind nicht gültig.
+The database is empty=Die Datenbank ist leer.
+Block data at =Block-Daten an den Koordinaten 
+Block data at =Block-Daten an den Koordinaten 
+No data found for the block at =Keine Daten gefunden für den Block an den Koordinaten 
+Block data verification successful.=Überprüfung der Block-Daten erfolgreich.
+The database is empty.=Die Datenbank ist leer.
+Block data at =Block-Daten an den Koordinaten 
+No data found for the block at =Keine Daten gefunden für den Block an den Koordinaten 
+Block Data Checker=Block-Daten-Überprüfer
+Event Database Statistics=Ereignis-Datenbank-Statistiken
+[blockwatch] Event Statistics=Ereignis-Statistiken
+Total number of events=Gesamtzahl der Ereignisse
+Total database size=Gesamtgröße der Datenbank
+Average size per entry=Durchschnittliche Größe pro Eintrag
+bytes=Bytes
+[blockwatch] Error during JSON serialization for events.=[blockwatch] Fehler bei der JSON-Serialisierung für Ereignisse.
+[blockwatch] Event statistics sent to player [player_name].=[blockwatch] Ereignisstatistiken gesendet an [player_name].
