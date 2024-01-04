@@ -331,6 +331,18 @@ minetest.register_chatcommand("randomcoords", {
     end,
 })
 
+
+
+
+
+
+
+
+
+
+
+
+-- fonction pour generer de faux entre pour test le mod 
 -- random_block_mod/init.lua
 
 -- Fonction pour obtenir un nom de bloc aléatoire
