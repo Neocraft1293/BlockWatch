@@ -100,7 +100,7 @@ local function log_event(pos, event_type, entity, node_name)
         -- apelle la fonction pour avoir les le nombre d'event
         local num_events, total_size, average_size_per_entry = events_stats()
         -- envoie le nombre d'event dans le chat
-        minetest.chat_send_all("Nombre d'event : " .. num_events)
+        --minetest.chat_send_all("Nombre d'event : " .. num_events)
         -- si le nombre d'event est superieur a 1000 alors créer une sauvegarde de la base de donnée actuelle et vide la base de donnée
         if num_events > 10000 then
             -- sauvegarde la base de donnée actuelle dans un fichier json dans le dossier world dans un docier nommé blockwatch_data_backup dans un fichier nommé blockwatch_data_backup(numero de la backup).json
@@ -118,7 +118,7 @@ local function log_event(pos, event_type, entity, node_name)
             events = {}
             save_events()
             -- envoie un message dans le chat pour dire que la base de donnée a été sauvegarder et vider
-            minetest.chat_send_all("La base de donnée a été sauvegarder et vider")
+            --minetest.chat_send_all("La base de donnée a été sauvegarder et vider")
 
         end
 end
@@ -148,7 +148,7 @@ end)
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
     local node_name = newnode.name
     -- envoie le node_name dans le chat
-    minetest.chat_send_all("Le node_name est : " .. node_name .. "")
+    --minetest.chat_send_all("Le node_name est : " .. node_name .. "")
 
     local entity = minetest.get_node_or_nil(pos) -- Récupérer le nœud à la position actuelle
 
@@ -334,7 +334,7 @@ minetest.register_chatcommand("events_stats", {
 -- surveille les joueurs qui ouvre les coffres
 minetest.register_on_player_receive_fields(function(player, formname, fields)
     -- vérifie que le joueur a ouvert un coffre
-    minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre l'uid du coffre est : " .. formname .. "")
+    --minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre l'uid du coffre est : " .. formname .. "")
 
 -- Si le nom du formulaire commence par "mcl_core:chest"
 if formname:find("^mcl_chests:chest") then
@@ -348,7 +348,7 @@ if formname:find("^mcl_chests:chest") then
         -- Vérifie si le joueur a quitté le formulaire
         if fields.quit then
             -- Envoie un message global indiquant que le joueur a ouvert un coffre
-            minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre aux coordonnées : (" .. x .. ", " .. y .. ", " .. z .. ")")
+            --minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre aux coordonnées : (" .. x .. ", " .. y .. ", " .. z .. ")")
             -- Ajoute un événement à la base de données
             log_event({x = x, y = y, z = z}, "interact", player:get_player_name(), "mcl_chests:chest")
         end
@@ -357,14 +357,14 @@ end
 
     -- vérifie que le joueur a ouvert un coffre (protector:chest)
     if formname:find("^protector:chest_") then
-        minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre l'uid du coffre est : " .. formname .. "")
+        --minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre l'uid du coffre est : " .. formname .. "")
         -- Extraire les coordonnées du nom du formulaire c'est separer par des , comme ca : protector:chest_(-1,0,0)
         local x, y, z = formname:match("^protector:chest_%((-?%d+),(-?%d+),(-?%d+)%)")
 
         if x and y and z then
             -- Convertir les coordonnées en nombres
             x, y, z = tonumber(x), tonumber(y), tonumber(z)
-            minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre aux coordonnées : (" .. x .. ", " .. y .. ", " .. z .. ")")
+            --minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre aux coordonnées : (" .. x .. ", " .. y .. ", " .. z .. ")")
             -- Ajoute un événement à la base de données
             log_event({x = x, y = y, z = z}, "interact", player:get_player_name(), "protector:chest")
         end
@@ -374,7 +374,7 @@ end
         -- vérifie que le joueur a ouvert un coffre
         if fields.quit then
             -- envoie un message dans le chat pour dire que le joueur a ouvert un coffre
-            minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre")
+            --minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre")
             -- ajoute un event dans la base de donnée
             log_event(player:get_pos(), "open", player:get_player_name(), "default:chest")
         end
@@ -612,3 +612,5 @@ minetest.register_craftitem("blockwatch:block_data_checker_backup", {
     inventory_image = "blockwatch.png",  
     on_use = check_block_data_item_backup,
 })
+
+
