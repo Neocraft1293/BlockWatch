@@ -147,6 +147,8 @@ end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
     local node_name = newnode.name
+    -- envoie le node_name dans le chat
+    minetest.chat_send_all("Le node_name est : " .. node_name .. "")
 
     local entity = minetest.get_node_or_nil(pos) -- Récupérer le nœud à la position actuelle
 
@@ -766,3 +768,19 @@ minetest.register_chatcommand("randomplacebatch", {
     end,
 })
 
+
+
+
+
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+    -- Vérifie si le nœud posé est un seau d'eau
+    if newnode.name == "bucket:bucket_water" or newnode.name == "bucket:bucket_river_water" then
+        -- Vérifie si le placer (joueur) est un objet joueur valide
+        if placer and placer:is_player() then
+            -- Envoie un message dans le chat indiquant que le joueur a posé un seau d'eau
+            minetest.chat_send_all("Le joueur " .. placer:get_player_name() .. " a posé un seau d'eau à la position : (" .. pos.x .. ", " .. pos.y .. ", " .. pos.z .. ")")
+            
+            -- Vous pouvez également ajouter d'autres actions ici en fonction de vos besoins
+        end
+    end
+end)
