@@ -5,6 +5,8 @@ local events_json_file_path = minetest.get_worldpath() .. "/blockwatch_data.json
 
 -- Initialiser la variable events en dehors de load_database
 local events = {}
+local events_backup = {}
+
 
 -- Fonction pour charger la base de données des événements
 local function load_events_database()
@@ -336,6 +338,238 @@ minetest.register_chatcommand("events_stats", {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--chrger les base de donnée de backup
+local function load_backup_database()
+    -- chemin vers le dossier blockwatch_data_backup
+    local blockwatch_data_backup_path = minetest.get_worldpath() .. "/blockwatch_data_backup"
+    -- vérifie que le dossier blockwatch_data_backup existe
+    if not minetest.mkdir(blockwatch_data_backup_path) then
+        minetest.log("error", S("[blockwatch] Error creating the blockwatch_data_backup directory."))
+    end
+    -- liste les fichiers dans le dossier blockwatch_data_backup
+    local blockwatch_data_backup_list = minetest.get_dir_list(blockwatch_data_backup_path, false)
+    -- vérifie que la liste n'est pas vide
+    if not blockwatch_data_backup_list then
+        minetest.log("error", S("[blockwatch] Error listing the blockwatch_data_backup directory."))
+    end
+    -- boucle pour lire les fichiers de log de backup
+    for _, blockwatch_data_backup_file in ipairs(blockwatch_data_backup_list) do
+        -- chemin vers le fichier de log de backup
+        local blockwatch_data_backup_file_path = blockwatch_data_backup_path .. "/" .. blockwatch_data_backup_file
+        -- charge le fichier de log de backup
+        local blockwatch_data_backup_file_data = minetest.deserialize(io.open(blockwatch_data_backup_file_path, "r"):read("*all"))
+        -- vérifie que le fichier de log de backup est bien chargé
+        if not blockwatch_data_backup_file_data then
+            minetest.log("error", S("[blockwatch] Error loading the blockwatch_data_backup file."))
+        end
+        -- boucle pour lire les entrées du fichier de log de backup
+        for key, event_list in pairs(blockwatch_data_backup_file_data) do
+            -- vérifie que la base de données n'est pas vide
+            if not events_backup[key] then
+                events_backup[key] = {}
+            end
+            -- boucle pour lire les entrées du fichier de log de backup
+            for _, event in ipairs(event_list) do
+                -- ajoute les entrées du fichier de log de backup à la base de données
+                table.insert(events_backup[key], event)
+            end
+        end
+    end
+    -- envoie un message dans le chat pour dire que la base de données a été chargée
+    minetest.chat_send_all("La base de données a été chargée")
+end
+
+
+
+
+
+
+-- Commande pour charger les bases de données des backups
+minetest.register_chatcommand("load_backup_database", {
+    params = "",
+    description = "Charge les bases de données des backups.",
+    func = function(name, param)
+        -- appelle la fonction pour charger les bases de données des backups
+        load_backup_database()
+        -- envoie un message dans le chat pour dire que la base de données a été chargée
+        minetest.chat_send_all("La base de données a été chargée")
+    end,
+})
+
+
+
+-- Commande pour donner le nombre d'events dans les bases de données de backup
+minetest.register_chatcommand("events_stats_backup", {
+    params = "",
+    description = "Donne le nombre d'events dans les bases de données de backup.",
+    func = function(name, param)
+        -- initialise les variables
+        local num_events = 0
+        local total_size = 0
+        local average_size_per_entry = 0
+        -- boucle pour lire les bases de données de backup
+        for _, event_list in pairs(events_backup) do
+            -- ajoute le nombre d'events dans la variable num_events
+            num_events = num_events + #event_list
+            -- boucle pour lire les entrées des bases de données de backup
+            for _, event in ipairs(event_list) do
+                -- ajoute la taille de l'entrée dans la variable total_size
+                total_size = total_size + #event
+            end
+        end
+        -- calcule la taille moyenne des entrées
+        average_size_per_entry = num_events > 0 and total_size / num_events or 0
+        -- envoie le nombre d'events dans le chat
+        minetest.chat_send_all("Nombre d'events : " .. num_events)
+        -- envoie la taille totale des entrées dans le chat
+        minetest.chat_send_all("Taille totale des entrées : " .. total_size)
+        -- envoie la taille moyenne des entrées dans le chat
+        minetest.chat_send_all("Taille moyenne des entrées : " .. average_size_per_entry)
+    end,
+})
+
+-- Commande pour vérifier un block dans les bases de données de backup
+minetest.register_chatcommand("check_block_data_blockwatch_backup", {
+    privs = {blockwatch_perm=true},
+    description = S("Check data for a specific block."),
+    params = "<x> <y> <z>",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+
+        if not player then
+            return false, "Le joueur n'est pas trouvé."
+        end
+
+        local x, y, z = param:match("(%S+)%s+(%S+)%s+(%S+)")
+        if not x or not y or not z then
+            return false, S("Please specify the coordinates of the block (e.g., /check_block_data 10 20 30).")
+        end
+
+        x, y, z = tonumber(x), tonumber(y), tonumber(z)
+
+        if not x or not y or not z then
+            return false, S("The coordinates of the block are not valid.")
+        end
+
+        local pos = {x = x, y = y, z = z}
+        local key = minetest.pos_to_string(pos)
+
+        local blockwatch_data_backup = events_backup
+        
+        -- vérifie que la base de données n'est pas vide
+
+        if not next(blockwatch_data_backup) then
+            return false, S("The database is empty.")
+        end
+        -- recherche les entrées du block dans les bases de données de backup
+        if blockwatch_data_backup[key] and #blockwatch_data_backup[key] > 0 then
+            local json_data = minetest.write_json(blockwatch_data_backup[key])
+
+            -- Formater les données pour les rendre plus lisibles
+            local formatted_data = ""
+            for _, event in ipairs(blockwatch_data_backup[key]) do
+                formatted_data = formatted_data .. "entity: " .. event.entity .. "\n"
+                formatted_data = formatted_data .. "event_type: " .. event.event_type .. "\n"
+                formatted_data = formatted_data .. "node_name: " .. event.node_name .. "\n"
+                formatted_data = formatted_data .. "timestamp: " .. event.timestamp .. "\n\n"
+            end
+
+            minetest.chat_send_player(name, S("Block data at ") .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
+            minetest.log("action", "[blockwatch] " .. S("Block data at ") .. minetest.pos_to_string(pos) .. " : \n" .. json_data)
+
+        else
+            minetest.chat_send_player(name, S("No data found for the block at ") .. minetest.pos_to_string(pos))
+        end
+    end,
+})
+
+-- crée un item qui permet de vérifier les données d'un bloc dans les bases de données de backup
+local function check_block_data_item_backup(itemstack, user, pointed_thing)
+    if not user or not pointed_thing or not pointed_thing.under then
+        return
+    end
+
+    local pos = pointed_thing.under
+    local key = minetest.pos_to_string(pos)
+    
+    local blockwatch_data_backup = events_backup
+
+    if not next(blockwatch_data_backup) then
+        minetest.chat_send_player(user:get_player_name(), S("The database is empty."))
+        return
+    end
+
+    if blockwatch_data_backup[key] and #blockwatch_data_backup[key] > 0 then
+        local formatted_data = ""
+        for _, event in ipairs(blockwatch_data_backup[key]) do
+            formatted_data = formatted_data .. "entity: " .. event.entity .. "\n"
+            formatted_data = formatted_data .. "event_type: " .. event.event_type .. "\n"
+            formatted_data = formatted_data .. "node_name: " .. event.node_name .. "\n"
+            formatted_data = formatted_data .. "timestamp: " .. event.timestamp .. "\n\n"
+        end
+
+        minetest.chat_send_player(user:get_player_name(), S("Block data at ") .. minetest.pos_to_string(pos) .. " : \n" .. formatted_data)
+    else
+        minetest.chat_send_player(user:get_player_name(), S("No data found for the block at ") .. minetest.pos_to_string(pos))
+    end
+end
+
+-- Enregistrement de l'item avec le préfixe "blockwatch:"
+minetest.register_craftitem("blockwatch:block_data_checker_backup", {
+    description = S("Block Data Checker Backup"),
+    inventory_image = "blockwatch.png",  
+    on_use = check_block_data_item_backup,
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- fonction pour generer de faux entre pour test le mod 
 
 -- random_pseudo_mod/init.lua
@@ -483,58 +717,4 @@ minetest.register_chatcommand("randomplacebatch", {
         minetest.chat_send_player(name, "Blocs placés avec succès.")
     end,
 })
-
-
--- fonction pour lire les fichier de log de backup et crée une base de donnée par fichier de log
-local function load_backup_database()
-    --chemin vers le dossier blockwatch_data_backup
-    local blockwatch_data_backup_path = minetest.get_worldpath() .. "/blockwatch_data_backup"
-    --verifie que le dossier blockwatch_data_backup existe
-    if not minetest.mkdir(blockwatch_data_backup_path) then
-        minetest.log("error", S("[blockwatch] Error creating the blockwatch_data_backup directory."))
-    end
-    --liste les fichier dans le dossier blockwatch_data_backup
-    local blockwatch_data_backup_list = minetest.get_dir_list(blockwatch_data_backup_path, false)
-    --verifie que la liste n'est pas vide
-    if not blockwatch_data_backup_list then
-        minetest.log("error", S("[blockwatch] Error listing the blockwatch_data_backup directory."))
-    end
-    --boucle pour lire les fichier de log de backup
-    for _, blockwatch_data_backup_file in ipairs(blockwatch_data_backup_list) do
-        --chemin vers le fichier de log de backup
-        local blockwatch_data_backup_file_path = blockwatch_data_backup_path .. "/" .. blockwatch_data_backup_file
-        --charge le fichier de log de backup
-        local blockwatch_data_backup_file_data = minetest.deserialize(io.open(blockwatch_data_backup_file_path, "r"):read("*all"))
-        --verifie que le fichier de log de backup est bien charger
-        if not blockwatch_data_backup_file_data then
-            minetest.log("error", S("[blockwatch] Error loading the blockwatch_data_backup file."))
-        end
-        --boucle pour lire les entrer du fichier de log de backup
-        for key, event_list in pairs(blockwatch_data_backup_file_data) do
-            --verifie que la base de donnée n'est pas vide
-            if not events[key] then
-                events[key] = {}
-            end
-            --boucle pour lire les entrer du fichier de log de backup
-            for _, event in ipairs(event_list) do
-                --ajoute les entrer du fichier de log de backup a la base de donnée
-                table.insert(events[key], event)
-            end
-        end
-    end
-    --sauvegarde la base de donnée
-    save_events()
-    --envoie un message dans le chat pour dire que la base de donnée a été charger
-    minetest.chat_send_all("La base de donnée a été charger")
-end
--- ajoute le meme item que blockwatch:block_data_checker mais avec un autre nom et regarde uniquement dans la base de donnée des backup
-
--- Enregistrement de l'item avec le préfixe "blockwatch:"
-minetest.register_craftitem("blockwatch:block_data_checker_backup", {
-    description = S("Block Data Checker Backup"),
-    inventory_image = "blockwatch.png",  
-    on_use = check_block_data_item_backup,
-})
-
-
 
