@@ -609,7 +609,7 @@ end
 -- Enregistrement de l'item avec le préfixe "blockwatch:"
 minetest.register_craftitem("blockwatch:block_data_checker_backup", {
     description = S("Block Data Checker Backup"),
-    inventory_image = "blockwatch.png",  
+    inventory_image = "blockwatch_backup.png",  
     on_use = check_block_data_item_backup,
 })
 
