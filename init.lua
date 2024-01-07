@@ -308,7 +308,7 @@ minetest.register_craftitem("blockwatch:block_data_checker", {
 
 -- Enregistrez ensuite la commande pour obtenir des statistiques sur la base de données des événements
 minetest.register_chatcommand("events_stats", {
-    privs = { basic_privs = true, blockwatch_perm = true },
+    privs = {blockwatch_perm=true},
     description = S("Event Database Statistics"),
     func = function(name, param)
         -- Utilisez la fonction events_stats pour obtenir les statistiques
@@ -464,7 +464,11 @@ local function load_backup_database()
     minetest.chat_send_all("La base de données a été chargée")
 end
 
-
+-- enregistrer la permission pour la base de donnée de backup
+minetest.register_privilege("blockwatch_perm_backup", {
+    description = S("Allows access to Blockwatch commands for backup database."),
+    give_to_singleplayer = false,  -- Permettre à un joueur unique de posséder cette permission
+})
 
 
 
@@ -473,6 +477,7 @@ end
 minetest.register_chatcommand("load_backup_database", {
     params = "",
     description = "Charge les bases de données des backups.",
+    privs = {blockwatch_perm_backup=true},
     func = function(name, param)
         -- appelle la fonction pour charger les bases de données des backups
         load_backup_database()
@@ -486,7 +491,9 @@ minetest.register_chatcommand("load_backup_database", {
 -- Commande pour donner le nombre d'events dans les bases de données de backup
 minetest.register_chatcommand("events_stats_backup", {
     params = "",
+    perm = "blockwatch_perm_backup",
     description = "Donne le nombre d'events dans les bases de données de backup.",
+    privs = {blockwatch_perm_backup=true},
     func = function(name, param)
         -- initialise les variables
         local num_events = 0
@@ -515,7 +522,7 @@ minetest.register_chatcommand("events_stats_backup", {
 
 -- Commande pour vérifier un block dans les bases de données de backup
 minetest.register_chatcommand("check_block_data_blockwatch_backup", {
-    privs = {blockwatch_perm=true},
+    privs = {blockwatch_perm_backup=true},
     description = S("Check data for a specific block."),
     params = "<x> <y> <z>",
     func = function(name, param)
