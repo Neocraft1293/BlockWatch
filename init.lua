@@ -329,7 +329,55 @@ minetest.register_chatcommand("events_stats", {
 --minetest.chat_send_player(name, S("Total number of events: ") .. events_stats.num_events)
 
 
+-- surveille les joueurs qui ouvre les coffres
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+    -- vérifie que le joueur a ouvert un coffre
+    minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre l'uid du coffre est : " .. formname .. "")
 
+-- Si le nom du formulaire commence par "mcl_core:chest"
+if formname:find("^mcl_chests:chest") then
+    -- Extraire les coordonnées du nom du formulaire
+    local x, y, z = formname:match("^mcl_chests:chest_(%-?%d+)_([%d-]+)_([%d-]+)")
+
+    if x and y and z then
+        -- Convertir les coordonnées en nombres
+        x, y, z = tonumber(x), tonumber(y), tonumber(z)
+
+        -- Vérifie si le joueur a quitté le formulaire
+        if fields.quit then
+            -- Envoie un message global indiquant que le joueur a ouvert un coffre
+            minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre aux coordonnées : (" .. x .. ", " .. y .. ", " .. z .. ")")
+            -- Ajoute un événement à la base de données
+            log_event({x = x, y = y, z = z}, "interact", player:get_player_name(), "mcl_chests:chest")
+        end
+    end
+end
+
+    -- vérifie que le joueur a ouvert un coffre (protector:chest)
+    if formname:find("^protector:chest_") then
+        minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre l'uid du coffre est : " .. formname .. "")
+        -- Extraire les coordonnées du nom du formulaire c'est separer par des , comme ca : protector:chest_(-1,0,0)
+        local x, y, z = formname:match("^protector:chest_%((-?%d+),(-?%d+),(-?%d+)%)")
+
+        if x and y and z then
+            -- Convertir les coordonnées en nombres
+            x, y, z = tonumber(x), tonumber(y), tonumber(z)
+            minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre aux coordonnées : (" .. x .. ", " .. y .. ", " .. z .. ")")
+            -- Ajoute un événement à la base de données
+            log_event({x = x, y = y, z = z}, "interact", player:get_player_name(), "protector:chest")
+        end
+    end
+
+    if formname == "default:chest" then
+        -- vérifie que le joueur a ouvert un coffre
+        if fields.quit then
+            -- envoie un message dans le chat pour dire que le joueur a ouvert un coffre
+            minetest.chat_send_all("Le joueur " .. player:get_player_name() .. " a ouvert un coffre")
+            -- ajoute un event dans la base de donnée
+            log_event(player:get_pos(), "open", player:get_player_name(), "default:chest")
+        end
+    end
+end)
 
 
 
