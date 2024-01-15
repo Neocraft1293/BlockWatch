@@ -80,6 +80,40 @@ local function events_stats()
     return num_events, total_size, average_size_per_entry
 end
 
+
+
+-- Fonction pour nettoyer les anciennes sauvegardes
+local function clean_old_backups(max_backups)
+    local backup_dir = minetest.get_worldpath() .. "/blockwatch_data_backup"
+    local backups = {}
+
+    -- Récupère la liste des fichiers de sauvegarde
+    local dir_list = minetest.get_dir_list(backup_dir) or {}
+    for _, file in ipairs(dir_list) do
+        table.insert(backups, file)
+    end
+
+    -- Trie les fichiers par date (les plus anciens d'abord)
+    table.sort(backups)
+
+    -- Supprime les fichiers excédant le nombre maximal autorisé
+    while #backups > max_backups do
+        local file_to_remove = backups[1]
+        local file_path = backup_dir .. "/" .. file_to_remove
+
+        -- Supprime le fichier
+        os.remove(file_path)
+
+        -- Supprime le fichier de la liste des sauvegardes
+        table.remove(backups, 1)
+        -- compte le nombre de fichier dans le dossier blockwatch_data_backup
+        local dir_list = minetest.get_dir_list(backup_dir) or {}
+        -- envoie le nombre de fichier dans le chat
+        minetest.chat_send_all("Nombre de fichier dans le dossier blockwatch_data_backup : " .. #dir_list .. "")
+    end
+end
+
+
 -- Fonction pour enregistrer un nouvel événement
 local function log_event(pos, event_type, entity, node_name)
     local key = minetest.pos_to_string(pos)
@@ -114,14 +148,19 @@ local function log_event(pos, event_type, entity, node_name)
                 json_file:write(minetest.serialize(events))
                 json_file:close()
             end
+            clean_old_backups(100)
             -- vide la base de donnée
             events = {}
             save_events()
             -- envoie un message dans le chat pour dire que la base de donnée a été sauvegarder et vider
-            --minetest.chat_send_all("La base de donnée a été sauvegarder et vider")
+            minetest.chat_send_all("La base de donnée a été sauvegarder et vider")
 
         end
 end
+
+
+
+
 
 --  enregistrez un événement lorsque le joueur casse ou place un bloc
 minetest.register_on_dignode(function(pos, oldnode, digger)
@@ -612,5 +651,4 @@ minetest.register_craftitem("blockwatch:block_data_checker_backup", {
     inventory_image = "blockwatch_backup.png",  
     on_use = check_block_data_item_backup,
 })
-
 
