@@ -109,7 +109,7 @@ local function clean_old_backups(max_backups)
         -- compte le nombre de fichier dans le dossier blockwatch_data_backup
         local dir_list = minetest.get_dir_list(backup_dir) or {}
         -- envoie le nombre de fichier dans le chat
-        minetest.chat_send_all("Nombre de fichier dans le dossier blockwatch_data_backup : " .. #dir_list .. "")
+        --minetest.chat_send_all("Nombre de fichier dans le dossier blockwatch_data_backup : " .. #dir_list .. "")
     end
 end
 
@@ -153,7 +153,7 @@ local function log_event(pos, event_type, entity, node_name)
             events = {}
             save_events()
             -- envoie un message dans le chat pour dire que la base de donnée a été sauvegarder et vider
-            minetest.chat_send_all("La base de donnée a été sauvegarder et vider")
+            --minetest.chat_send_all("La base de donnée a été sauvegarder et vider")
 
         end
 end
