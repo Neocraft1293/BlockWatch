@@ -266,7 +266,72 @@ end)
 
 
 
+--commande qui affiche tout les event de la base de donnée
+minetest.register_chatcommand("show_events", {
+    privs = {blockwatch_perm=true},
+    description = S("Show all events"),
+    func = function(name, param)
+        -- boucle pour lire les entrées de la base de données
+        for key, event_list in pairs(events) do
+            -- boucle pour lire les entrées de la base de données
+            for _, event in ipairs(event_list) do
+                -- envoie les entrées de la base de données dans le chat
+                minetest.chat_send_player(name, "entity: " .. event.entity .. " event_type: " .. event.event_type .. " node_name: " .. event.node_name .. " timestamp: " .. event.timestamp .. "")
+            end
+        end
+        return true, S("[blockwatch] Events sent to player ") .. name .. "."
+    end,
+})
+-- commande pour rechercher les event en fonction des filtre choisi
+-- /search_events <pos> <event_type> <entity> <node_name>
+-- l'utilisateur peut se servir de "all" pour ne pas utiliser un filtre 
+-- exemple : /search_events all all all all
+--ou 
+-- /search_events 0,0,0 all all all qui affichera tout les event a la position 0,0,0
+--ou 
+-- /search_events all place all all qui affichera tout les event de type place
+--ou
+-- /search_events all all all default:stone qui affichera tout les event avec le nom de bloc default:stone
+--ou
+-- /search_events all all neo all qui affichera tout les event avec le pseudo neo
+--ou
+-- /search_events 0,0,0 place neo default:stone qui affichera tout les event a la position 0,0,0 de type place avec le pseudo neo et le nom de bloc default:stone
 
+minetest.register_chatcommand("search_events", {
+    privs = {blockwatch_perm=true},
+    description = S("Search events based on filters"),
+    params = "<pos> <event_type> <entity> <node_name>",
+    func = function(name, param)
+        -- Split les paramètres en utilisant l'espace comme séparateur
+        local params = param:split(" ")
+        
+        -- Initialiser les filtres avec des valeurs par défaut
+        local pos_filter = params[1] or "all"
+        local event_type_filter = params[2] or "all"
+        local entity_filter = params[3] or "all"
+        local node_name_filter = params[4] or "all"
+
+        -- Boucle pour filtrer les événements en fonction des critères
+        local matching_events = {}
+        for key, event_list in pairs(events) do
+            for _, event in ipairs(event_list) do
+                if (pos_filter == "all" or event.pos == pos_filter)
+                    and (event_type_filter == "all" or event.event_type == event_type_filter)
+                    and (entity_filter == "all" or event.entity == entity_filter)
+                    and (node_name_filter == "all" or event.node_name == node_name_filter) then
+                    table.insert(matching_events, event)
+                end
+            end
+        end
+
+        -- Envoyer les événements filtrés au joueur
+        for _, event in ipairs(matching_events) do
+            minetest.chat_send_player(name, "entity: " .. event.entity .. " event_type: " .. event.event_type .. " node_name: " .. event.node_name .. " timestamp: " .. event.timestamp .. "")
+        end
+
+        return true, S("[blockwatch] Matching events sent to player ") .. name .. "."
+    end,
+})
 
 
 
