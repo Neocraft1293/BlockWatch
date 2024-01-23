@@ -265,23 +265,6 @@ minetest.register_on_mods_loaded(function()
 end)
 
 
-
---commande qui affiche tout les event de la base de donnée
-minetest.register_chatcommand("show_events", {
-    privs = {blockwatch_perm=true},
-    description = S("Show all events"),
-    func = function(name, param)
-        -- boucle pour lire les entrées de la base de données
-        for key, event_list in pairs(events) do
-            -- boucle pour lire les entrées de la base de données
-            for _, event in ipairs(event_list) do
-                -- envoie les entrées de la base de données dans le chat
-                minetest.chat_send_player(name, "entity: " .. event.entity .. " event_type: " .. event.event_type .. " node_name: " .. event.node_name .. " timestamp: " .. event.timestamp .. "")
-            end
-        end
-        return true, S("[blockwatch] Events sent to player ") .. name .. "."
-    end,
-})
 -- commande pour rechercher les event en fonction des filtre choisi
 -- /search_events <pos> <event_type> <entity> <node_name>
 -- l'utilisateur peut se servir de "all" pour ne pas utiliser un filtre 
@@ -319,19 +302,29 @@ minetest.register_chatcommand("search_events", {
                     and (event_type_filter == "all" or event.event_type == event_type_filter)
                     and (entity_filter == "all" or event.entity == entity_filter)
                     and (node_name_filter == "all" or event.node_name == node_name_filter) then
-                    table.insert(matching_events, event)
+                    table.insert(matching_events, { key = key, event = event })
                 end
             end
         end
 
+        local numero_event = 0
+
         -- Envoyer les événements filtrés au joueur
-        for _, event in ipairs(matching_events) do
-            minetest.chat_send_player(name, "entity: " .. event.entity .. " event_type: " .. event.event_type .. " node_name: " .. event.node_name .. " timestamp: " .. event.timestamp .. "")
+        for _, item in ipairs(matching_events) do
+            local key = item.key
+            local event = item.event
+
+            numero_event = numero_event + 1
+            minetest.chat_send_player(name, "pos: " .. key .. " entity: " .. event.entity .. " event_type: " .. event.event_type .. " node_name: " .. event.node_name .. " timestamp: " .. event.timestamp)
         end
+
+        minetest.chat_send_all("Nombre d'events : " .. numero_event)
 
         return true, S("[blockwatch] Matching events sent to player ") .. name .. "."
     end,
 })
+
+
 
 
 
