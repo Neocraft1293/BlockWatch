@@ -299,7 +299,6 @@ minetest.register_chatcommand("search_events", {
         for key, event_list in pairs(events) do
             for _, event in ipairs(event_list) do
                 -- envoie le key dans le chat 
-                minetest.chat_send_all("key :" .. key .. "")
                 if (pos_filter == "all" or key == pos_filter)
                     and (event_type_filter == "all" or event.event_type == event_type_filter)
                     and (entity_filter == "all" or event.entity == entity_filter)
@@ -325,7 +324,7 @@ minetest.register_chatcommand("search_events", {
             minetest.chat_send_player(name, "pos: " .. key .. " entity: " .. event.entity .. " event_type: " .. event.event_type .. " node_name: " .. event.node_name .. " timestamp: " .. event.timestamp)
         end
 
-        minetest.chat_send_all("Nombre d'events : " .. numero_event)
+        minetest.log("Nombre d'events : " .. numero_event)
 
         return true, S("[blockwatch] Événements correspondants envoyés au joueur ") .. name .. "."
     end,
