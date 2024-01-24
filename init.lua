@@ -282,10 +282,10 @@ end)
 
 minetest.register_chatcommand("search_events", {
     privs = {blockwatch_perm=true},
-    description = S("Search events based on filters"),
+    description = S("Rechercher des événements basés sur des filtres"),
     params = "<pos> <event_type> <entity> <node_name>",
     func = function(name, param)
-        -- Split les paramètres en utilisant l'espace comme séparateur
+        -- Diviser les paramètres en utilisant l'espace comme séparateur
         local params = param:split(" ")
         
         -- Initialiser les filtres avec des valeurs par défaut
@@ -307,6 +307,11 @@ minetest.register_chatcommand("search_events", {
             end
         end
 
+        -- Fonction de tri en fonction de l'horodatage (timestamp)
+        table.sort(matching_events, function(a, b)
+            return a.event.timestamp < b.event.timestamp
+        end)
+
         local numero_event = 0
 
         -- Envoyer les événements filtrés au joueur
@@ -320,7 +325,7 @@ minetest.register_chatcommand("search_events", {
 
         minetest.chat_send_all("Nombre d'events : " .. numero_event)
 
-        return true, S("[blockwatch] Matching events sent to player ") .. name .. "."
+        return true, S("[blockwatch] Événements correspondants envoyés au joueur ") .. name .. "."
     end,
 })
 
@@ -366,170 +371,7 @@ minetest.register_chatcommand("search_events", {
 
 
 
--- fonction pour generer de faux entre pour test le mod 
 
--- random_pseudo_mod/init.lua
-
--- Fonction pour générer un pseudo aléatoire
-local function generate_random_pseudo()
-    local adjectives = {"Red", "Blue", "Green", "Happy", "Sad", "Fast", "Slow", "Big", "Small", "Tall", "Short", "neo", "super", "ultra", "mega", "giga", "hyper", "ultra", "uber", "omega", "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"}
-    local nouns = {"Cat", "Dog", "Bird", "Tree", "Mountain", "Ocean", "Star", "firite", "diamant", "ruby", "saphir", "emeraude", "topaze", "amethyste", "onyx", "perle", "agate", "citrine", "quartz", "tourmaline", "zircon", "jade", "lapis-lazuli", "malachite", "obsidienne", "opale", "ambre", "corail", "ivoire", "ambre", "manger", "boire", "dormir", "courir", "marcher", "sauter", "voler", "nager", "chanter", "danser", "jouer", "rire", "pleurer", "penser", "parler", "ecouter", "regarder", "sentir", "toucher", "gouter", "manger", "boire", "dormir", "courir", "marcher", "sauter", "voler", "nager", "chanter", "danser", "jouer", "rire", "pleurer", "penser", "parler", "ecouter", "regarder", "sentir", "toucher", "gouter"}
-
-    local random_adjective = adjectives[math.random(1, #adjectives)]
-    local random_noun = nouns[math.random(1, #nouns)]
-
-    return random_adjective .. random_noun
-end
-
--- Commande pour générer un pseudo aléatoire
-minetest.register_chatcommand("randompseudo", {
-    params = "",
-    description = "Génère un pseudo aléatoire.",
-    func = function(name, param)
-        local random_pseudo = generate_random_pseudo()
-        minetest.chat_send_player(name, "Votre pseudo aléatoire : " .. random_pseudo)
-    end,
-})
-
--- random_coordinates_mod/init.lua
-
--- Fonction pour générer des coordonnées aléatoires
-local function generate_random_coordinates()
-    local random_x = math.random(-100, 100)
-    local random_y = math.random(1, 50)
-    local random_z = math.random(-100, 100)
-
-    return random_x, random_y, random_z
-end
-
--- Commande pour générer des coordonnées aléatoires
-minetest.register_chatcommand("randomcoords", {
-    params = "",
-    description = "Génère des coordonnées aléatoires.",
-    func = function(name, param)
-        -- Appeler la fonction pour générer les coordonnées
-        local x, y, z = generate_random_coordinates()
-
-        -- Envoyer les coordonnées au joueur
-        minetest.chat_send_player(name, "Vos coordonnées aléatoires : X=" .. x .. " Y=" .. y .. " Z=" .. z)
-    end,
-})
-
--- random_block_mod/init.lua
-
--- Fonction pour obtenir un nom de bloc aléatoire
-local function generate_random_block_name()
-    local registered_nodes = minetest.registered_nodes
-    local node_names = {}
-
-    -- Collecter les noms de blocs disponibles
-    for name, _ in pairs(registered_nodes) do
-        table.insert(node_names, name)
-    end
-
-    -- Vérifier s'il y a des blocs disponibles
-    if #node_names > 0 then
-        -- Choisir un nom de bloc au hasard
-        local random_block_name = node_names[math.random(1, #node_names)]
-        return random_block_name
-    else
-        return "Aucun bloc disponible"
-    end
-end
-
--- Commande pour générer un nom de bloc aléatoire
-minetest.register_chatcommand("randomblock", {
-    params = "",
-    description = "Génère un nom de bloc aléatoire.",
-    func = function(name, param)
-        -- Appeler la fonction pour générer le nom de bloc
-        local random_block_name = generate_random_block_name()
-
-        -- Envoyer le nom de bloc au joueur
-        minetest.chat_send_player(name, "Votre bloc aléatoire : " .. random_block_name)
-    end,
-})
-
--- commande pour générer des log de bloc aléatoire puis les placer
-minetest.register_chatcommand("randomblocklog", {
-    params = "",
-    description = "Génère un nom de bloc aléatoire.",
-    func = function(name, param)
-        -- Appeler la fonction pour générer le nom de bloc
-        local random_block_name = generate_random_block_name()
-        --speudo aleatoire
-        local random_pseudo = generate_random_pseudo()
-        --cordonner aleatoire
-        local x, y, z = generate_random_coordinates()
-        --pose le bloc au cordonner
-        minetest.set_node({x=x, y=y, z=z}, {name=random_block_name})
-        --ajoute au log 
-        blockwatch.log_event({x=x, y=y, z=z}, "place", random_pseudo, random_block_name)
-
-        -- Envoyer le nom de bloc au joueur
-        minetest.chat_send_player(name, "Votre bloc aléatoire : " .. random_block_name .. " placer a la position : X=" .. x .. " Y=" .. y .. " Z=" .. z .. " par le joueur : " .. random_pseudo)
-        minetest.set_node({x=0, y=0, z=0}, {name=random_block_name})
-    end,
-})
-
--- cree une fonction qui fait la meme chose que la commande /randomblocklog
-local function randomblocklog()
-    -- Appeler la fonction pour générer le nom de bloc
-    local random_block_name = generate_random_block_name()
-    --speudo aleatoire
-    local random_pseudo = generate_random_pseudo()
-    --cordonner aleatoire
-    local x, y, z = generate_random_coordinates()
-    --pose le bloc au cordonner
-    minetest.set_node({x=x, y=y, z=z}, {name=random_block_name})
-    --ajoute au log 
-    blockwatch.log_event({x=x, y=y, z=z}, "place", random_pseudo, random_block_name)
-    minetest.chat_send_all("Votre bloc aléatoire : " .. random_block_name .. " placer a la position : X=" .. x .. " Y=" .. y .. " Z=" .. z)
-end
-
-
--- Commande pour placer un bloc aléatoire un certain nombre de fois
-minetest.register_chatcommand("randomplacebatch", {
-    params = "<nombre>",
-    description = "Place un bloc aléatoire un certain nombre de fois.",
-    func = function(name, params)
-        -- Récupérer le nombre de fois spécifié en paramètre
-        local count = tonumber(params)
-
-        -- Vérifier si le nombre est valide
-        if not count or count <= 0 then
-            minetest.chat_send_player(name, "Utilisation incorrecte. Utilisez /randomplacebatch <nombre>")
-            --nom de block restant
-            minetest.chat_send_player(name, "Il reste " .. #node_names .. " blocs disponible")
-            return
-        end
-
-        -- Exécuter la fonction randomblocklog le nombre de fois spécifié
-        for i = 1, count do
-            randomblocklog()
-        end
-
-        -- Envoyer un message au joueur
-        minetest.chat_send_player(name, "Blocs placés avec succès.")
-    end,
-})
-
-
-
-
-
-minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-    -- Vérifie si le nœud posé est un seau d'eau
-    if newnode.name == "bucket:bucket_water" or newnode.name == "bucket:bucket_river_water" then
-        -- Vérifie si le placer (joueur) est un objet joueur valide
-        if placer and placer:is_player() then
-            -- Envoie un message dans le chat indiquant que le joueur a posé un seau d'eau
-            minetest.chat_send_all("Le joueur " .. placer:get_player_name() .. " a posé un seau d'eau à la position : (" .. pos.x .. ", " .. pos.y .. ", " .. pos.z .. ")")
-            
-            -- Vous pouvez également ajouter d'autres actions ici en fonction de vos besoins
-        end
-    end
-end)
 
 
 
@@ -749,3 +591,224 @@ minetest.register_craftitem("blockwatch:block_data_checker_backup", {
     inventory_image = "blockwatch_backup.png",  
     on_use = check_block_data_item_backup,
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- fonction pour generer de faux entre pour test le mod 
+
+-- random_pseudo_mod/init.lua
+
+-- Fonction pour générer un pseudo aléatoire
+local function generate_random_pseudo()
+    local adjectives = {"Red", "Blue", "Green", "Happy", "Sad", "Fast", "Slow", "Big", "Small", "Tall", "Short", "neo", "super", "ultra", "mega", "giga", "hyper", "ultra", "uber", "omega", "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"}
+    local nouns = {"Cat", "Dog", "Bird", "Tree", "Mountain", "Ocean", "Star", "firite", "diamant", "ruby", "saphir", "emeraude", "topaze", "amethyste", "onyx", "perle", "agate", "citrine", "quartz", "tourmaline", "zircon", "jade", "lapis-lazuli", "malachite", "obsidienne", "opale", "ambre", "corail", "ivoire", "ambre", "manger", "boire", "dormir", "courir", "marcher", "sauter", "voler", "nager", "chanter", "danser", "jouer", "rire", "pleurer", "penser", "parler", "ecouter", "regarder", "sentir", "toucher", "gouter", "manger", "boire", "dormir", "courir", "marcher", "sauter", "voler", "nager", "chanter", "danser", "jouer", "rire", "pleurer", "penser", "parler", "ecouter", "regarder", "sentir", "toucher", "gouter"}
+
+    local random_adjective = adjectives[math.random(1, #adjectives)]
+    local random_noun = nouns[math.random(1, #nouns)]
+
+    return random_adjective .. random_noun
+end
+
+-- Commande pour générer un pseudo aléatoire
+minetest.register_chatcommand("randompseudo", {
+    params = "",
+    description = "Génère un pseudo aléatoire.",
+    func = function(name, param)
+        local random_pseudo = generate_random_pseudo()
+        minetest.chat_send_player(name, "Votre pseudo aléatoire : " .. random_pseudo)
+    end,
+})
+
+-- random_coordinates_mod/init.lua
+
+-- Fonction pour générer des coordonnées aléatoires
+local function generate_random_coordinates()
+    local random_x = math.random(-100, 100)
+    local random_y = math.random(1, 50)
+    local random_z = math.random(-100, 100)
+
+    return random_x, random_y, random_z
+end
+
+-- Commande pour générer des coordonnées aléatoires
+minetest.register_chatcommand("randomcoords", {
+    params = "",
+    description = "Génère des coordonnées aléatoires.",
+    func = function(name, param)
+        -- Appeler la fonction pour générer les coordonnées
+        local x, y, z = generate_random_coordinates()
+
+        -- Envoyer les coordonnées au joueur
+        minetest.chat_send_player(name, "Vos coordonnées aléatoires : X=" .. x .. " Y=" .. y .. " Z=" .. z)
+    end,
+})
+
+-- random_block_mod/init.lua
+
+-- Fonction pour obtenir un nom de bloc aléatoire
+local function generate_random_block_name()
+    local registered_nodes = minetest.registered_nodes
+    local node_names = {}
+
+    -- Collecter les noms de blocs disponibles
+    for name, _ in pairs(registered_nodes) do
+        table.insert(node_names, name)
+    end
+
+    -- Vérifier s'il y a des blocs disponibles
+    if #node_names > 0 then
+        -- Choisir un nom de bloc au hasard
+        local random_block_name = node_names[math.random(1, #node_names)]
+        return random_block_name
+    else
+        return "Aucun bloc disponible"
+    end
+end
+
+-- Commande pour générer un nom de bloc aléatoire
+minetest.register_chatcommand("randomblock", {
+    params = "",
+    description = "Génère un nom de bloc aléatoire.",
+    func = function(name, param)
+        -- Appeler la fonction pour générer le nom de bloc
+        local random_block_name = generate_random_block_name()
+
+        -- Envoyer le nom de bloc au joueur
+        minetest.chat_send_player(name, "Votre bloc aléatoire : " .. random_block_name)
+    end,
+})
+
+-- commande pour générer des log de bloc aléatoire puis les placer
+minetest.register_chatcommand("randomblocklog", {
+    params = "",
+    description = "Génère un nom de bloc aléatoire.",
+    func = function(name, param)
+        -- Appeler la fonction pour générer le nom de bloc
+        local random_block_name = generate_random_block_name()
+        --speudo aleatoire
+        local random_pseudo = generate_random_pseudo()
+        --cordonner aleatoire
+        local x, y, z = generate_random_coordinates()
+        --pose le bloc au cordonner
+        minetest.set_node({x=x, y=y, z=z}, {name=random_block_name})
+        --ajoute au log 
+        blockwatch.log_event({x=x, y=y, z=z}, "place", random_pseudo, random_block_name)
+
+        -- Envoyer le nom de bloc au joueur
+        minetest.chat_send_player(name, "Votre bloc aléatoire : " .. random_block_name .. " placer a la position : X=" .. x .. " Y=" .. y .. " Z=" .. z .. " par le joueur : " .. random_pseudo)
+        minetest.set_node({x=0, y=0, z=0}, {name=random_block_name})
+    end,
+})
+
+-- cree une fonction qui fait la meme chose que la commande /randomblocklog
+local function randomblocklog()
+    -- Appeler la fonction pour générer le nom de bloc
+    local random_block_name = generate_random_block_name()
+    --speudo aleatoire
+    local random_pseudo = generate_random_pseudo()
+    --cordonner aleatoire
+    local x, y, z = generate_random_coordinates()
+    --pose le bloc au cordonner
+    minetest.set_node({x=x, y=y, z=z}, {name=random_block_name})
+    --ajoute au log 
+    blockwatch.log_event({x=x, y=y, z=z}, "place", random_pseudo, random_block_name)
+    minetest.chat_send_all("Votre bloc aléatoire : " .. random_block_name .. " placer a la position : X=" .. x .. " Y=" .. y .. " Z=" .. z)
+end
+
+
+-- Commande pour placer un bloc aléatoire un certain nombre de fois
+minetest.register_chatcommand("randomplacebatch", {
+    params = "<nombre>",
+    description = "Place un bloc aléatoire un certain nombre de fois.",
+    func = function(name, params)
+        -- Récupérer le nombre de fois spécifié en paramètre
+        local count = tonumber(params)
+
+        -- Vérifier si le nombre est valide
+        if not count or count <= 0 then
+            minetest.chat_send_player(name, "Utilisation incorrecte. Utilisez /randomplacebatch <nombre>")
+            --nom de block restant
+            minetest.chat_send_player(name, "Il reste " .. #node_names .. " blocs disponible")
+            return
+        end
+
+        -- Exécuter la fonction randomblocklog le nombre de fois spécifié
+        for i = 1, count do
+            randomblocklog()
+        end
+
+        -- Envoyer un message au joueur
+        minetest.chat_send_player(name, "Blocs placés avec succès.")
+    end,
+})
+
+
+
+
+
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+    -- Vérifie si le nœud posé est un seau d'eau
+    if newnode.name == "bucket:bucket_water" or newnode.name == "bucket:bucket_river_water" then
+        -- Vérifie si le placer (joueur) est un objet joueur valide
+        if placer and placer:is_player() then
+            -- Envoie un message dans le chat indiquant que le joueur a posé un seau d'eau
+            minetest.chat_send_all("Le joueur " .. placer:get_player_name() .. " a posé un seau d'eau à la position : (" .. pos.x .. ", " .. pos.y .. ", " .. pos.z .. ")")
+            
+            -- Vous pouvez également ajouter d'autres actions ici en fonction de vos besoins
+        end
+    end
+end)
