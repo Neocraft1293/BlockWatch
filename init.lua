@@ -493,11 +493,7 @@ minetest.register_chatcommand("events_stats_backup", {
         -- calcule la taille moyenne des entrées
         average_size_per_entry = num_events > 0 and total_size / num_events or 0
         -- envoie le nombre d'events dans le chat
-        minetest.chat_send_all("Nombre d'events : " .. num_events)
-        -- envoie la taille totale des entrées dans le chat
-        minetest.chat_send_all("Taille totale des entrées : " .. total_size)
-        -- envoie la taille moyenne des entrées dans le chat
-        minetest.chat_send_all("Taille moyenne des entrées : " .. average_size_per_entry)
+        minetest.chat_send_player(name, S("Total number of events: ") .. num_events)
     end,
 })
 
