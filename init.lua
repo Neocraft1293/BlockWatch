@@ -298,7 +298,9 @@ minetest.register_chatcommand("search_events", {
         local matching_events = {}
         for key, event_list in pairs(events) do
             for _, event in ipairs(event_list) do
-                if (pos_filter == "all" or event.pos == pos_filter)
+                -- envoie le key dans le chat 
+                minetest.chat_send_all("key :" .. key .. "")
+                if (pos_filter == "all" or key == pos_filter)
                     and (event_type_filter == "all" or event.event_type == event_type_filter)
                     and (entity_filter == "all" or event.entity == entity_filter)
                     and (node_name_filter == "all" or event.node_name == node_name_filter) then
@@ -328,6 +330,7 @@ minetest.register_chatcommand("search_events", {
         return true, S("[blockwatch] Événements correspondants envoyés au joueur ") .. name .. "."
     end,
 })
+
 
 
 
