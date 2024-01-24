@@ -246,7 +246,7 @@ minetest.register_chatcommand("events_stats", {
 function blockwatch.reload_events_database()
     events = {}
     blockwatch.load_events_database()
-    minetest.chat_send_all("[blockwatch] Base de données d'événements rechargée.")
+    minetest.log("La base de données a été rechargée")
 end
 
 -- Commande pour recharger la base de données des événements
@@ -441,8 +441,7 @@ local function load_backup_database()
             end
         end
     end
-    -- envoie un message dans le chat pour dire que la base de données a été chargée
-    minetest.chat_send_all("La base de données a été chargée")
+    minetest.log("action", S("[blockwatch] Backup database loaded successfully."))
 end
 
 -- enregistrer la permission pour la base de donnée de backup
@@ -463,7 +462,7 @@ minetest.register_chatcommand("load_backup_database", {
         -- appelle la fonction pour charger les bases de données des backups
         load_backup_database()
         -- envoie un message dans le chat pour dire que la base de données a été chargée
-        minetest.chat_send_all("La base de données a été chargée")
+        minetest.chat_send_player(name, "La base de données a été chargée")
     end,
 })
 
